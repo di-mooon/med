@@ -1,0 +1,125 @@
+{% extends 'homepage/base.html' %}
+
+{% load static %}
+{% block title %}Профиль{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="container-sm">
+            {% if  profile.first_name == '' %}
+                <div class="alert alert-warning" role="alert">
+                    Пожалуйста заполните профиль полностью!
+                </div>
+
+            {% endif %}
+        </div>
+        <h1 class="mb-3">Личный кабинет</h1>
+        <div class="row row-cols-2">
+            <div class="col">
+                <div class="card shadow-sm">
+                    {% if not profile.avatar.objects %}
+                        <img src="{% static 'no_foto.jpg' %}" class="img-thumbnail" alt="...">
+                    {% else %}
+                        <img src="{{ profile.avatar.url }}" class="img-thumbnail" alt="...">
+                    {% endif %}
+                </div>
+
+            </div>
+
+            <div class="col">
+                <br>
+                <br>
+                <br>
+                <br>
+                <div style="width: 700px;">
+
+                    <div class="row row-cols-2">
+                        <div class="col">
+                            <h6 class=" font_6" style="line-height:1.3em;font-size:14px"><span style="font-weight:bold"><span
+                                    style="font-family:open sans,sans-serif"><span class="color_19"><span
+                                    style="letter-spacing:0.05em">Фамилия:</span></span></span></span></h6>
+                            <h4 class="font_4" style="font-size:30px">{{ profile.last_name }}</h4>
+                            <br>
+                        </div>
+                        <div class="col">
+                            <h6 class="font_6" style="line-height:1.3em;font-size:14px"><span
+                                    style="font-weight:bold"><span
+                                    style="font-family:open sans,sans-serif"><span class="color_19"><span
+                                    style="letter-spacing:0.05em">Отчество:</span></span></span></span></h6>
+                            <h4 class="font_4" style="font-size:30px">{{ profile.patronymic }}</h4>
+
+                        </div>
+
+                        <div class="col">
+                            <h6 class="font_6" style="line-height:1.3em;font-size:14px"><span
+                                    style="font-weight:bold"><span
+                                    style="font-family:open sans,sans-serif"><span class="color_19"><span
+                                    style="letter-spacing:0.05em">Имя:</span></span></span></span></h6>
+                            <h4 class="font_4" style="font-size:30px">{{ profile.first_name }}</h4>
+                            <br>
+                        </div>
+
+                        <br>
+                        <div class="col">
+
+                            <h6 class="font_6" style="line-height:1.3em;font-size:14px"><span
+                                    style="font-weight:bold"><span
+                                    style="font-family:open sans,sans-serif"><span class="color_19"><span
+                                    style="letter-spacing:0.05em">Дата рождения:</span></span></span></span></h6>
+                            <p class="font_8" style="line-height:1.3em;font-size:14px"><span
+                                    style="letter-spacing:0.05em">{{ profile.data }}</span>
+                            </p>
+                        </div>
+                        <div class="col">
+                            <h6 class="font_6" style="line-height:1.3em;font-size:14px"><span
+                                    style="font-weight:bold"><span
+                                    style="font-family:open sans,sans-serif"><span class="color_19"><span
+                                    style="letter-spacing:0.05em">Email:</span></span></span></span></h6>
+                            <p class="font_8" style="line-height:1.3em;font-size:14px"><span
+                                    style="letter-spacing:0.05em">{{ profile.email_two }}</span>
+                            </p>
+                        </div>
+
+                        <div class="col">
+                            <h6 class="font_6" style="line-height:1.3em;font-size:14px"><span
+                                    style="font-weight:bold"><span
+                                    style="font-family:open sans,sans-serif"><span class="color_19"><span
+                                    style="letter-spacing:0.05em">Телефон:</span></span></span></span></h6>
+                            <p class="font_8" style="line-height:1.3em;font-size:14px"><span
+                                    style="letter-spacing:0.05em">{{ profile.phone }}</span>
+                            </p>
+                        </div>
+                        <div class="col">
+                            <h6 class="font_6" style="line-height:1.3em;font-size:14px"><span
+                                    style="font-weight:bold"><span
+                                    style="font-family:open sans,sans-serif"><span class="color_19"><span
+                                    style="letter-spacing:0.05em">СНИЛС:</span></span></span></span></h6>
+                            <p class="font_8" style="line-height:1.3em;font-size:14px"><span
+                                    style="letter-spacing:0.05em">{{ profile.insurance }}</span>
+                            </p>
+                            <div class="btn-group" role="group" aria-label="Basic outlined example">
+                                <button type="button" class="btn btn-outline-primary"><a
+                                        href="{% url 'profile_update' %}" class="card-link"> Редактировать </a>
+                                </button>
+                                {% if user.is_authenticated %}
+                                    <button type="button" class="btn btn-outline-primary">
+                                        <a href="{% url 'logout' %}"> Выйти </a>
+                                    </button>
+                                {% endif %}
+                                <button type="button" class="btn btn-outline-primary"><a href="{% url 'home' %}">
+                                    На главную </a></button>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="profile">
+
+    </div>
+
+{% endblock %}
+

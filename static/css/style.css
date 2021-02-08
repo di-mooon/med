@@ -1,0 +1,22 @@
+body {
+    margin:0;
+}
+.profile{
+
+    margin-left: 600px;
+    margin-right: 600px;
+
+}
+
+.comments{
+
+    margin-left: 100px;
+    margin-right: 100px;
+
+}
+#bg{
+    background-size: 1800px 900px;
+    background-repeat: no-repeat;
+    background-position: top;
+    background-attachment: fixed;
+}
