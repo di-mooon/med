@@ -5,6 +5,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.urls import reverse
 from djangoProject1 import settings
+
+
 class Profile(models.Model):
     user = models.OneToOneField(User,verbose_name='Пользователь', on_delete=models.CASCADE)
     avatar = models.ImageField('Фото', upload_to='static/', default='static/no_foto.jpg')

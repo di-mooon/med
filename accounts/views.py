@@ -38,7 +38,7 @@ def register(request):
 
 
         }
-    return render(request,'signup.html',context)
+    return render(request, '../templates/signup.html', context)
 
 def index(request):
-    return render(request,'homepage/index.html')
+    return render(request, '../templates/homepage/index.html')
