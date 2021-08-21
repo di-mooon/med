@@ -1,7 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-from user.models import Profile
-
 
 class Card(models.Model):
     photo = models.ImageField('Изображение', upload_to='static/')

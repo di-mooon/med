@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic.base import View
 from appointment.models import TimeRecord
 from appointment.service import create_record
@@ -16,17 +16,16 @@ class RecordTimeView(View):
             new_form.name = form.cleaned_data['name']
             new_form.insurance = form.cleaned_data['insurance']
             new_form.phone = form.cleaned_data['phone']
-            f =form.save()
-            print(f)
+            form.save()
             time = TimeRecord.objects.filter(
                 daterecord__id=kwargs.get('p'),
                 card__id=kwargs.get('pk'),
                 id=kwargs.get('k')
             )
-            time.update(recorded=True, card_id=kwargs.get('pk'))
+            time.update(patient_id=new_form.id, recorded=True, card_id=kwargs.get('pk'))
 
             messages.info(request, 'Вы успешно записались')
-            return HttpResponseRedirect("card_list")
+            return redirect("card_list")
         form = PatientForm()
         context = {'form': form,
                    }

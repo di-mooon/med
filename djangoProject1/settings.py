@@ -36,7 +36,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'accounts.apps.UserConfig',
 
     'crispy_forms',
     'debug_toolbar',
@@ -110,8 +109,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-LOGIN_REDIRECT_URL = 'home'
-LOGOUT_REDIRECT_URL = 'home'
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
@@ -126,8 +124,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
 STATIC_DIR = os.path.join(BASE_DIR, 'static')
@@ -142,9 +138,10 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'djangoProject1.EmailBackend.CustomBackend',
 ]
-AUTH_PROFILE_MODULE = 'user.UserProfile'
-
+AUTH_USER_MODEL = 'user.ProfilePatient'
+LOGOUT_REDIRECT_URL = 'card_list'
 DATE_INPUT_FORMATS = ['%d.%m.%Y']
+
 try:
     from local_settings import *
 except ImportError:

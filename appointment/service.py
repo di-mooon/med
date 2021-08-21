@@ -17,7 +17,7 @@ def create_record(request):
     time = datetime.date.today()
     week = time.isoweekday()
     date_list = []
-    if not DateRecord.objects.filter(date=time).exists() and week == 5:
+    if not DateRecord.objects.filter(date=time).exists() and week == 6:
 
         for i in range(5):
             date = DateRecord.objects.create(date=time + datetime.timedelta(days=i), weekday=WEEKDAY[i])
