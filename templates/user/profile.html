@@ -16,10 +16,29 @@
                                 <img src="{{ user.avatar.url }}" alt="Admin" class="rounded-circle" width="150">
                                 <div class="mt-3">
                                     <h4>{{ user.first_name }} {{ user.last_name }}</h4>
-                                    {#                      <p class="text-secondary mb-1">Full Stack Developer</p>#}
-                                    {#                      <p class="text-muted font-size-sm">Bay Area, San Francisco, CA</p>#}
-                                    {#                      <button class="btn btn-primary">Follow</button>#}
-                                    {#                      <button class="btn btn-outline-primary">Message</button>#}
+                                    <h6 class="text-secondary mb-1">Записи на прием к врачу</h6>
+                                    {% for record in user.patient_record.all %}
+                                        {% for time in record.time_patient.all %}
+                                            <hr>
+                                            <div class="card" style="width: 18rem; border: 1px solid green">
+                                                <div class="card-body">
+                                                    <ul class="list-group list-group-flush" style="text-align: left;">
+                                                        <li class="list-group-item text-secondary mb-1">Время: {{ time.time }}</li>
+                                                        <li class="list-group-item text-secondary mb-1">Дата: {{ time.daterecord }}</li>
+                                                        <li class="list-group-item text-secondary mb-1">Врач: {{ time.card }}</li>
+                                                    </ul>
+{#                                                    <p class="text-muted font-size-sm">Время: {{ time.time }}</p>#}
+{#                                                    <p class="text-muted font-size-sm">Дата: {{ time.daterecord }}</p>#}
+{#                                                    <p class="text-muted font-size-sm">Врач: {{ time.card }}</p>#}
+                                                    {#                                                    <a href="#" class="card-link">Card link</a>#}
+                                                    <a href="#">Подробнее</a>
+                                                </div>
+                                            </div>
+
+                                            {#                      <button class="btn btn-primary">Follow</button>#}
+                                            {#                      <button class="btn btn-outline-primary">Message</button>#}
+                                        {% endfor %}
+                                    {% endfor %}
                                 </div>
                             </div>
                         </div>
@@ -85,8 +104,8 @@
                             <hr>
                             <div class="row">
                                 <div class="col-sm-12">
-                                    <a class="btn btn-warning " target="__blank" href="">Редактировать</a>
-                                    <a class="btn btn-info " target="__blank" href="{% url 'logout' %}">Выйти</a>
+                                    <a class="btn btn-warning " href="{% url 'profile_update' %}">Редактировать</a>
+                                    <a class="btn btn-info " href="{% url 'logout' %}">Выйти</a>
                                 </div>
                             </div>
                         </div>

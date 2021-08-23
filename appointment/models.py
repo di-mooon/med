@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from homepage.models import Card
+from user.models import ProfilePatient
 
 
 class DateRecord(models.Model):
@@ -17,6 +18,18 @@ class Patient(models.Model):
     phone = models.CharField('Телефон', max_length=20)
     insurance = models.CharField('Страховой полис', max_length=20)
     time_record_create = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(
+        ProfilePatient,
+        on_delete=models.CASCADE,
+        related_name='patient_record',
+        verbose_name='User',
+        blank=True, null=True
+    )
+
+    def delete(self, *args, **kwargs):
+        time = TimeRecord.objects.filter(patient=self)
+        time.update(recorded=False)
+        super(Patient, self).delete(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -42,10 +55,11 @@ class TimeRecord(models.Model):
     )
     patient = models.ForeignKey(
         Patient,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         verbose_name='Пациент',
         blank=True,
-        null=True
+        null=True,
+        related_name='time_patient'
     )
     date_now = models.DateTimeField(auto_now_add=True)
     recorded = models.BooleanField(default=False)
@@ -54,7 +68,7 @@ class TimeRecord(models.Model):
         return str(self.time)
 
 
-class Record(models.Model):
+class Record(models.Model):  # не используется
     card = models.ForeignKey(Card, on_delete=models.CASCADE, related_name='record')
     time = models.ForeignKey(TimeRecord, on_delete=models.CASCADE, related_name='record_time', blank=True, null=True)
     date = models.ForeignKey(DateRecord, on_delete=models.CASCADE, related_name='record_date', blank=True, null=True)

@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.views.generic.base import View
 
+from appointment.models import TimeRecord
 from appointment.service import create_record
 from .models import Card
 from .servise import create_cards_list
@@ -15,5 +16,3 @@ class CardViews(View):
             'cards': cards_list,
         }
         return render(request, 'homepage/card_list.html', context)
-
-

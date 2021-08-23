@@ -8,8 +8,8 @@ urlpatterns = [
     path('signup/', views.RegisterView.as_view(), name='signup'),
     path('login/', views.LoginView.as_view(), name='login'),
     path('', include('django.contrib.auth.urls')),
+    path('update/', views.ProfileUpdate.as_view(), name='profile_update'),
     path('<str:pk>/', views.ProfileDetail.as_view(), name='profile'),
 
-    # path('update/', update_profile, name='profile_update'),
 
 ]

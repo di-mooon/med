@@ -54,6 +54,7 @@
                                         <div class="modal-body">
                                             <h1 class="mb-3">Выберите дату и время</h1>
                                             <div class="container">
+
                                                 <table class="table">
                                                     <tbody>
                                                     {% for date,times in appointment.items %}
@@ -66,8 +67,13 @@
                                                                         <button type="button" class="btn btn-outline-danger"
                                                                                 disabled>{{ time.time|time:"H:i" }}</button>
                                                                     {% else %}
+                                                                        {% if request.user.is_authenticated %}
                                                                         <a href="{% url 'record-create' time.card.id date.id time.id %}"
                                                                            class="btn btn-outline-success ">{{ time.time|time:"H:i" }}</a>
+                                                                        {% else %}
+                                                                            <a href="{% url 'login' %}"
+                                                                           class="btn btn-outline-success ">{{ time.time|time:"H:i" }}</a>
+                                                                            {% endif %}
                                                                     {% endif %}
                                                                 {% endfor %}
                                                             </td>

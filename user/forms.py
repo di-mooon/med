@@ -1,12 +1,52 @@
 from django.forms import ModelForm, TextInput, EmailInput, DateInput, ImageField
 from .models import ProfilePatient, ProfileDoctor, User
-
+import re
 from django.db.models import Q
 from django import forms
 from django.forms import TextInput, EmailInput
 
 
-class RegistrationForm(forms.ModelForm):
+class ProfilePatientForm(forms.ModelForm):
+    first_name = forms.CharField(widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': "Иван", })
+    )
+
+    last_name = forms.CharField(widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': "Иванов"})
+    )
+    patronymic = forms.CharField(widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': "Иванович"})
+    )
+    phone = forms.CharField(widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': "+7(___)-___-__-__"})
+    )
+    insurance = forms.CharField(widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': "СНИЛС"})
+    )
+    email = forms.EmailField(widget=forms.EmailInput(attrs={
+        'class': 'form-control',
+        'placeholder': "Email"})
+    )
+    date = forms.DateField(widget=forms.DateInput(attrs={
+        'class': 'form-control',
+        'placeholder': "Дата рождения"})
+    )
+    residential_address = forms.CharField(widget=forms.DateInput(attrs={
+        'class': 'form-control',
+        'placeholder': "Адрес проживания"})
+    )
+
+    class Meta:
+        model = ProfilePatient
+        fields = ['first_name', 'last_name', 'patronymic', 'phone', 'insurance', 'email', 'date', 'residential_address']
+
+
+class RegistrationForm(ProfilePatientForm):
     username = forms.CharField(required=True)
     confirm_password = forms.CharField(widget=forms.PasswordInput)
     password = forms.CharField(widget=forms.PasswordInput)
@@ -21,7 +61,7 @@ class RegistrationForm(forms.ModelForm):
         self.fields['patronymic'].label = 'Отчество'
         self.fields['date'].label = 'Дата рождения'
         self.fields['phone'].label = 'Моб.телефон'
-        # self.fields['residential_address'].label = 'Адрес проживания'
+        self.fields['residential_address'].label = 'Адрес проживания'
         self.fields['email'].label = 'Email'
         self.fields['insurance'].label = 'СНИЛС'
 
@@ -33,7 +73,7 @@ class RegistrationForm(forms.ModelForm):
 
     def clean_username(self):
         username = self.cleaned_data['username']
-        if ProfilePatient.objects.filter(username=username).exists():
+        if ProfilePatient.objects.filter(Q(username=username) | Q(email=username)).exists():
             raise forms.ValidationError('Данный логин уже зарегистрирован')
         return username
 
@@ -48,40 +88,8 @@ class RegistrationForm(forms.ModelForm):
         model = ProfilePatient
         fields = ['username', 'password',
                   'confirm_password', 'first_name',
-                  'last_name', 'patronymic', 'date',
+                  'last_name', 'patronymic', 'date', 'residential_address',
                   'phone', 'email', 'insurance', ]
-        widgets = {
-            'first_name': TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': "Иван"
-            }),
-            'last_name': TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': "Иванов"
-            }),
-            'patronymic': TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': "Иванович"
-            }),
-            'phone': TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': "+7(___)-___-__-__"
-            }),
-            'insurance': TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': "СНИЛС"
-            }),
-            'email': EmailInput(attrs={
-                'class': 'form-control',
-                'placeholder': "example@gmail.com"
-            }),
-            'date': DateInput(attrs={
-                'type': 'date',
-                'class': 'form-control',
-                'placeholder': "Введите дату рождения"
-            })
-
-        }
 
 
 class LoginForm(forms.ModelForm):
@@ -111,9 +119,3 @@ class LoginForm(forms.ModelForm):
     class Meta:
         model = ProfilePatient
         fields = ['username', 'password']
-
-
-class ProfilePatientForm(forms.ModelForm):
-    class Meta:
-        model = ProfilePatient
-        fields = ['first_name', 'last_name', 'patronymic', 'phone', 'insurance', 'email', 'avatar', 'date']

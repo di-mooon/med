@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate, login
 from django.views import View
-
+from django.http import HttpResponseRedirect
 from .forms import ProfilePatientForm, RegistrationForm, LoginForm
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -51,6 +51,7 @@ class RegisterView(View):
             new_user.insurance = form.cleaned_data['insurance']
             new_user.username = form.cleaned_data['username']
             new_user.email = form.cleaned_data['email']
+            new_user.residential_address = form.cleaned_data['residential_address']
             new_user.save()
             new_user.set_password(form.cleaned_data['password'])
             new_user.save()
@@ -65,16 +66,51 @@ class RegisterView(View):
 
 class ProfileDetail(View):
     def get(self, request, *args, **kwargs):
-        user = ProfilePatient.objects.get(username=request.user.username)
+        user = ProfilePatient.objects.prefetch_related(
+            'patient_record__time_patient',
+            'patient_record__time_patient__daterecord',
+            'patient_record__time_patient__card',
+        ).get(username=request.user.username)
         context = {
             'user': user,
         }
         return render(request, 'user/profile.html', context)
 
+
 class ProfileUpdate(View):
     def get(self, request, *args, **kwargs):
+        form = ProfilePatientForm(request.POST or None)
         user = ProfilePatient.objects.get(username=request.user.username)
+        form.initial['last_name'] = user.last_name
+        form.initial['first_name'] = user.first_name
+        form.initial['patronymic'] = user.patronymic
+        form.initial['phone'] = user.phone
+        form.initial['email'] = user.email
+        form.initial['insurance'] = user.insurance
+        form.initial['date'] = user.date
+        form.initial['residential_address'] = user.residential_address
+
         context = {
             'user': user,
+            'form': form,
         }
-        return render(request, 'user/profile-update.html', context)
+        return render(request, 'user/profile_update.html', context)
+
+    def post(self, request, *args, **kwargs):
+        form = ProfilePatientForm(request.POST or None, instance=request.user)
+        if form.is_valid():
+            update_user = form.save(commit=False)
+            update_user.last_name = form.cleaned_data['last_name']
+            update_user.first_name = form.cleaned_data['first_name']
+            update_user.phone = form.cleaned_data['phone']
+            update_user.patronymic = form.cleaned_data['patronymic']
+            update_user.date = form.cleaned_data['date']
+            update_user.insurance = form.cleaned_data['insurance']
+            update_user.email = form.cleaned_data['email']
+            update_user.residential_address = form.cleaned_data['residential_address']
+            update_user.save()
+            return HttpResponseRedirect(f"/profile/{request.user.username}/")
+        context = {
+            'form': form,
+        }
+        return render(request, 'user/profile_update.html', context)
