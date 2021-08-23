@@ -4,7 +4,7 @@ from django.views.generic.base import View
 from appointment.models import TimeRecord
 from appointment.service import create_record
 from .models import Card
-from .servise import create_cards_list
+from .service import create_cards_list
 
 
 class CardViews(View):

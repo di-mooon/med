@@ -1,16 +1,19 @@
 from django.contrib.auth import authenticate, login
 from django.views import View
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from .forms import ProfilePatientForm, RegistrationForm, LoginForm
 from django.shortcuts import render, redirect
 from django.contrib import messages
 
-from .models import ProfilePatient
+from .models import ProfilePatient, UserToken
+from .service import profile_activate
 
 
 class LoginView(View):
     def get(self, request):
         form = LoginForm(request.POST or None)
+        print(request.user)
+
         context = {
             'form': form,
         }
@@ -52,12 +55,15 @@ class RegisterView(View):
             new_user.username = form.cleaned_data['username']
             new_user.email = form.cleaned_data['email']
             new_user.residential_address = form.cleaned_data['residential_address']
+            new_user.is_active = False
             new_user.save()
             new_user.set_password(form.cleaned_data['password'])
             new_user.save()
-            user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password'])
-            login(request, user)
-            return redirect('card_list')
+            profile_activate(new_user.email)
+
+            # user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password'])
+            # login(request, user)
+            return render(request, 'user/profile_activate.html')
         context = {
             'form': form,
         }
@@ -70,7 +76,7 @@ class ProfileDetail(View):
             'patient_record__time_patient',
             'patient_record__time_patient__daterecord',
             'patient_record__time_patient__card',
-        ).get(username=request.user.username)
+        ).get(username=request.user.username, is_active=True)
         context = {
             'user': user,
         }
@@ -80,7 +86,7 @@ class ProfileDetail(View):
 class ProfileUpdate(View):
     def get(self, request, *args, **kwargs):
         form = ProfilePatientForm(request.POST or None)
-        user = ProfilePatient.objects.get(username=request.user.username)
+        user = ProfilePatient.objects.get(username=request.user.username, is_active=True)
         form.initial['last_name'] = user.last_name
         form.initial['first_name'] = user.first_name
         form.initial['patronymic'] = user.patronymic
@@ -114,3 +120,14 @@ class ProfileUpdate(View):
             'form': form,
         }
         return render(request, 'user/profile_update.html', context)
+
+
+class ProfileActivate(View):
+    def get(self, request, *args, **kwargs):
+        try:
+            email_token = UserToken.objects.get(token=kwargs.get('token'))
+            ProfilePatient.objects.filter(email=email_token.email).update(is_active=True)
+            email_token.delete()
+        except:
+            raise Http404
+        return render(request, 'user/profile_confirm.html')

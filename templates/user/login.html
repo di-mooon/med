@@ -8,21 +8,21 @@
         <br>
         <br>
         <main class="form-signin">
+            <div class="container-sm" style="max-width: 30%">
+                <h2>Авторизация</h2>
+                <p>Если у вас еще нет аккаунта, пожалуйста <a href="{% url 'signup' %}">зарегистрируйтесь</a></p>
 
-            <div class="container-sm" style="max-width: 40%">
-                <form method="post" class="container">
-                    <h2>Авторизация</h2>
+                <form method="post">
+
                     {% csrf_token %}
 
                     {{ form|crispy }}
                     <br>
-                    <div class="btn-group" role="group" aria-label="Basic example">
                         <button type="submit" class="btn btn-outline-success">Войти</button>
-                        <a type="button" href="" class="btn btn-outline-secondary">Назад</a>
-                    </div>
+                        <a href="">Забыли пароль?</a>
 
                     <br>
-                    <a href="{% url 'signup' %}">Зарегистрироваться</a>
+
                 </form>
 
                 <br>

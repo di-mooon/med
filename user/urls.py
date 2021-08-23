@@ -6,10 +6,11 @@ from django.contrib import admin
 
 urlpatterns = [
     path('signup/', views.RegisterView.as_view(), name='signup'),
+    path('activate/<str:token>/', views.ProfileActivate.as_view(), name='activate'),
     path('login/', views.LoginView.as_view(), name='login'),
     path('', include('django.contrib.auth.urls')),
     path('update/', views.ProfileUpdate.as_view(), name='profile_update'),
-    path('<str:pk>/', views.ProfileDetail.as_view(), name='profile'),
+    path('<str:username>/', views.ProfileDetail.as_view(), name='profile'),
 
 
 ]
