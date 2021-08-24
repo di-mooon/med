@@ -18,6 +18,6 @@ urlpatterns = [
     path('reset/done/', PasswordResetCompleteView.as_view(), name='password_reset_complete'),
 
     path('<str:username>/', views.ProfileDetail.as_view(), name='profile'),
-    path('update/<str:username>/', views.ProfileUpdate.as_view(), name='profile_update'),
+    path('update/<slug:username>/', views.ProfileUpdateView.as_view(), name='profile_update'),
 
 ]
