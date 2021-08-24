@@ -1,0 +1,14 @@
+{% load i18n %}
+{% blocktrans %}
+Вы успешно зарегистрировались!
+    {{ domain }} for {{ user }}:
+
+    Для активации аккаунта перейдите по ссылке:
+{% endblocktrans %}
+
+
+{% block reset_link %}
+{{ protocol }}://{{ domain }}{% url 'activate' uidb64=uid token=token %}"
+{% endblock %}
+Если данное письмо отправлено Вам ошибочно, проигнорируйте его.
+

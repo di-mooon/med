@@ -1,9 +1,11 @@
-from django.forms import ModelForm, TextInput, EmailInput, DateInput, ImageField
-from .models import ProfilePatient, ProfileDoctor, User
-import re
+from django.contrib.auth import password_validation
+from django.core.exceptions import ValidationError
+
+from .models import ProfilePatient, ProfileDoctor
 from django.db.models import Q
 from django import forms
-from django.forms import TextInput, EmailInput
+from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm, AuthenticationForm, UserCreationForm, \
+    UsernameField, PasswordChangeForm
 
 
 class ProfilePatientForm(forms.ModelForm):
@@ -47,9 +49,15 @@ class ProfilePatientForm(forms.ModelForm):
 
 
 class RegistrationForm(ProfilePatientForm):
-    username = forms.CharField(required=True)
-    confirm_password = forms.CharField(widget=forms.PasswordInput)
-    password = forms.CharField(widget=forms.PasswordInput)
+    username = UsernameField(widget=forms.TextInput(attrs={'autofocus': True}))
+    confirm_password = forms.CharField(widget=forms.PasswordInput(attrs={
+        'type': 'password',
+        'class': 'form-control',
+    }))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={
+        'type': 'password',
+        'class': 'form-control',
+    }))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -84,6 +92,15 @@ class RegistrationForm(ProfilePatientForm):
             raise forms.ValidationError('Пароли не совпадают')
         return self.cleaned_data
 
+    def _post_clean(self):
+        super()._post_clean()
+        password = self.cleaned_data.get('password2')
+        if password:
+            try:
+                password_validation.validate_password(password, self.instance)
+            except ValidationError as error:
+                self.add_error('password2', error)
+
     class Meta:
         model = ProfilePatient
         fields = ['username', 'password',
@@ -91,31 +108,76 @@ class RegistrationForm(ProfilePatientForm):
                   'last_name', 'patronymic', 'date', 'residential_address',
                   'phone', 'email', 'insurance', ]
 
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.set_password(self.cleaned_data["password"])
+        if commit:
+            user.save()
+        return user
 
-class LoginForm(forms.ModelForm):
-    username = forms.CharField(required=True)
-    password = forms.CharField(widget=forms.PasswordInput)
+
+class LoginForm(AuthenticationForm):
+    password = forms.CharField(
+        label="Пароль",
+        strip=False,
+        widget=forms.PasswordInput(attrs={
+            'autocomplete': 'current-password',
+            'type': 'password',
+            'class': 'form-control',
+        }),
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['username'].label = 'Логин или Email'
         self.fields['password'].label = 'Пароль'
 
-    def clean(self):
-        username = self.cleaned_data['username']
-        password = self.cleaned_data['password']
-
-        if not ProfilePatient.objects.filter(Q(username=username) | Q(email=username)):
-            raise forms.ValidationError('Пользователь не найден')
-
-        user = ProfilePatient.objects.filter(Q(username=username) | Q(email=username)).first()
-
-        if user:
-            if not user.check_password(password):
-                raise forms.ValidationError('Неверный пароль')
-
-        return self.cleaned_data
-
     class Meta:
         model = ProfilePatient
         fields = ['username', 'password']
+
+
+class PasswordResetUserForm(PasswordResetForm):
+    email = forms.EmailField(
+        label="Адрес электронной почты",
+        max_length=150,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': "Email"}
+        )
+    )
+
+
+class SetPasswordUserForm(SetPasswordForm):
+    new_password1 = forms.CharField(
+        label="Новый пароль",
+        widget=forms.PasswordInput(attrs={
+            'autocomplete': 'new-password',
+            'type': 'password',
+            'class': 'form-control',
+        }),
+        strip=False,
+
+    )
+    new_password2 = forms.CharField(
+        label="Подтвердите пароль",
+        strip=False,
+        widget=forms.PasswordInput(attrs={
+            'autocomplete': 'new-password',
+            'type': 'password',
+            'class': 'form-control',
+        }),
+    )
+
+
+class PasswordChangeUserForm(SetPasswordUserForm, PasswordChangeForm):
+    old_password = forms.CharField(
+        label="Старый пароль",
+        strip=False,
+        widget=forms.PasswordInput(attrs={
+            'autocomplete': 'current-password',
+            'autofocus': True,
+            'type': 'password',
+            'class': 'form-control',
+        }),
+    )

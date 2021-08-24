@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User, AbstractUser
+from django.urls import reverse
 
 
 class ProfilePatient(AbstractUser):
@@ -15,11 +16,11 @@ class ProfilePatient(AbstractUser):
         return self.username
 
     def save(self, *args, **kwargs):
-        super(ProfilePatient,self).save(*args, **kwargs)
+        super(ProfilePatient, self).save(*args, **kwargs)
         self.slug = "{}".format(self.username)
 
-    # def get_absolute_url(self):
-    #   return reverse('profile', kwargs={'name':self.user.username})
+    def get_absolute_url(self):
+        return reverse('profile', kwargs={'slug': self.slug})
 
 
 class ProfileDoctor(models.Model):
@@ -33,7 +34,10 @@ class ProfileDoctor(models.Model):
         return self.name
 
 
-class UserToken(models.Model):
-    email = models.EmailField('Email')
-    token = models.CharField('Token', max_length=50)
-    date_create = models.DateTimeField(auto_now_add=True)
+class Mail_Domains(models.Model):
+    name_mail = models.CharField(max_length=150)
+    domain = models.CharField(max_length=15)
+    url = models.URLField()
+
+    def __str__(self):
+        return self.domain

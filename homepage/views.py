@@ -7,7 +7,7 @@ from .models import Card
 from .service import create_cards_list
 
 
-class CardViews(View):
+class CardView(View):
     def get(self, request, **kwargs):
         cards = Card.objects.all().prefetch_related('card_time')
         create_record(request)
@@ -16,3 +16,7 @@ class CardViews(View):
             'cards': cards_list,
         }
         return render(request, 'homepage/card_list.html', context)
+
+class IndexView(View):
+    def get(self,request):
+        return render(request,'homepage/card_list.html',)

@@ -14,6 +14,8 @@ from pathlib import Path
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
@@ -138,9 +140,25 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'djangoProject1.EmailBackend.CustomBackend',
 ]
+
+
 AUTH_USER_MODEL = 'user.ProfilePatient'
+# LOGIN_REDIRECT_URL = '/accounts/'
 LOGOUT_REDIRECT_URL = 'card_list'
+
+
 DATE_INPUT_FORMATS = ['%d.%m.%Y']
+
+
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = "confirmemaildjango@yandex.ru"
+EMAIL_HOST_PASSWORD = "confirmemaildjango1234"
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+SERVER_EMAIL = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
 
 try:
     from local_settings import *

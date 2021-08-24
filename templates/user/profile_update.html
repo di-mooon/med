@@ -6,7 +6,7 @@
         <div class="main-body">
 
             <h1>Личный кабинет</h1>
-            <form method="post" action="{% url 'profile_update' %}">
+            <form method="post" action="{% url 'profile_update' user.username %}">
                 {% csrf_token %}
                 <div class="row gutters-sm">
                     <div class="col-md-4 mb-3">

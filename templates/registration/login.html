@@ -2,32 +2,23 @@
 {% block title %}Вход{% endblock %}
 {% load static %}
 {% block content %}
-
     {% load crispy_forms_tags %}
     <div class="profile">
         <br>
         <br>
-        <main class="form-signin">
+        <div class="form-signin">
             <div class="container-sm" style="max-width: 30%">
                 <h2>Авторизация</h2>
                 <p>Если у вас еще нет аккаунта, пожалуйста <a href="{% url 'signup' %}">зарегистрируйтесь</a></p>
-
                 <form method="post">
-
                     {% csrf_token %}
-
                     {{ form|crispy }}
                     <br>
-                        <button type="submit" class="btn btn-outline-success">Войти</button>
-                        <a href="">Забыли пароль?</a>
-
+                    <input type="submit" class="btn btn-outline-success" value="Войти">
+                    <a href="{% url 'password_reset' %}">Забыли пароль?</a>
                     <br>
-
                 </form>
-
-                <br>
-
-
-        </main>
+            </div>
+        </div>
     </div>
 {% endblock %}

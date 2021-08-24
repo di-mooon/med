@@ -1,82 +1,77 @@
-from django.contrib.auth import authenticate, login
+import asyncio
+
+from django.contrib.auth.views import PasswordResetView, PasswordResetConfirmView, LoginView, PasswordChangeView
+from django.utils.encoding import force_text
+from django.utils.http import urlsafe_base64_decode
 from django.views import View
 from django.http import HttpResponseRedirect, Http404
-from .forms import ProfilePatientForm, RegistrationForm, LoginForm
-from django.shortcuts import render, redirect
-from django.contrib import messages
+from django.contrib.auth.tokens import default_token_generator
+from django.shortcuts import render
+from django.views.generic import UpdateView, CreateView
 
-from .models import ProfilePatient, UserToken
+from .forms import ProfilePatientForm, RegistrationForm, LoginForm, PasswordResetUserForm, SetPasswordUserForm, \
+    PasswordChangeUserForm
+from .models import ProfilePatient
 from .service import profile_activate
 
 
-class LoginView(View):
-    def get(self, request):
-        form = LoginForm(request.POST or None)
-        print(request.user)
+class LoginUserView(LoginView):
+    form_class = LoginForm
 
-        context = {
-            'form': form,
-        }
-        return render(request, 'user/login.html', context)
-
-    def post(self, request):
-        form = LoginForm(request.POST or None)
-        if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            user = authenticate(username=username, password=password)
-            if user:
-                login(request, user)
-                return redirect('card_list')
-        context = {
-            'form': form,
-        }
-        return render(request, 'user/login.html', context)
+    def get_success_url(self):
+        return f"/accounts/{self.request.POST.get('username', '')}"
 
 
-class RegisterView(View):
+class RegisterView(CreateView):
+    form_class = RegistrationForm
+    template_name = 'registration/signup.html'
+    success_url = 'activate'
+
+    def form_valid(self, form):
+        new_user = form.save(commit=False)
+        new_user.is_active = False
+        new_user.save()
+        profile_activate(self.request, new_user)
+        return render(self.request, 'registration/activate_account.html')
+
+
+class PasswordChangeUserView(PasswordChangeView):
+    form_class = PasswordChangeUserForm
+
+
+class PasswordResetUserView(PasswordResetView):
+    form_class = PasswordResetUserForm
+    email_template_name = 'send_mail/password_reset_email.html'
+
+
+class PasswordResetConfirmUserView(PasswordResetConfirmView):
+    form_class = SetPasswordUserForm
+
+
+class ProfileActivate(View):
     def get(self, request, *args, **kwargs):
-        form = RegistrationForm(request.POST or None)
-        context = {
-            'form': form,
-        }
-        return render(request, 'user/signup.html', context)
-
-    def post(self, request, *args, **kwargs):
-        form = RegistrationForm(request.POST or None)
-        if form.is_valid():
-            new_user = form.save(commit=False)
-            new_user.last_name = form.cleaned_data['last_name']
-            new_user.first_name = form.cleaned_data['first_name']
-            new_user.phone = form.cleaned_data['phone']
-            new_user.patronymic = form.cleaned_data['patronymic']
-            new_user.date = form.cleaned_data['date']
-            new_user.insurance = form.cleaned_data['insurance']
-            new_user.username = form.cleaned_data['username']
-            new_user.email = form.cleaned_data['email']
-            new_user.residential_address = form.cleaned_data['residential_address']
-            new_user.is_active = False
-            new_user.save()
-            new_user.set_password(form.cleaned_data['password'])
-            new_user.save()
-            profile_activate(new_user.email)
-
-            # user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password'])
-            # login(request, user)
-            return render(request, 'user/profile_activate.html')
-        context = {
-            'form': form,
-        }
-        return render(request, 'user/signup.html', context)
+        try:
+            uid = force_text(urlsafe_base64_decode(kwargs.get('uidb64')))
+            user = ProfilePatient.objects.get(pk=uid)
+            print(uid)
+            if user is not None and default_token_generator.check_token(user, kwargs.get('token')):
+                user.is_active = True
+                user.save()
+        except:
+            raise Http404
+        return render(request, 'registration/confirm_account.html')
 
 
 class ProfileDetail(View):
     def get(self, request, *args, **kwargs):
-        user = ProfilePatient.objects.prefetch_related(
-            'patient_record__time_patient',
-            'patient_record__time_patient__daterecord',
-            'patient_record__time_patient__card',
-        ).get(username=request.user.username, is_active=True)
+        try:
+            user = ProfilePatient.objects.prefetch_related(
+                'patient_record__time_patient',
+                'patient_record__time_patient__daterecord',
+                'patient_record__time_patient__card',
+            ).get(username=request.user.username, is_active=True)
+        except:
+            raise Http404
         context = {
             'user': user,
         }
@@ -115,19 +110,20 @@ class ProfileUpdate(View):
             update_user.email = form.cleaned_data['email']
             update_user.residential_address = form.cleaned_data['residential_address']
             update_user.save()
-            return HttpResponseRedirect(f"/profile/{request.user.username}/")
+            return HttpResponseRedirect(f"/accounts/{self.request.user.username}/")
         context = {
             'form': form,
         }
         return render(request, 'user/profile_update.html', context)
 
-
-class ProfileActivate(View):
-    def get(self, request, *args, **kwargs):
-        try:
-            email_token = UserToken.objects.get(token=kwargs.get('token'))
-            ProfilePatient.objects.filter(email=email_token.email).update(is_active=True)
-            email_token.delete()
-        except:
-            raise Http404
-        return render(request, 'user/profile_confirm.html')
+# class ProfileUpdateView(UpdateView):
+#     template_name = 'user/profile_update.html'
+#     fields = ['last_name', 'first_name']
+#     slug_field = 'slug'
+#     slug_url_kwarg = 'slug'
+#
+#     def get_success_url(self):
+#         return f"/profile/{self.request.user.username}/"
+#
+#     def get_queryset(self):
+#         return ProfilePatient.objects.filter(username=self.request.user.username, is_active=True)
