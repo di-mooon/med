@@ -71,7 +71,7 @@ class RegistrationForm(ProfilePatientForm):
         self.fields['phone'].label = 'Моб.телефон'
         self.fields['residential_address'].label = 'Адрес проживания'
         self.fields['email'].label = 'Email'
-        self.fields['insurance'].label = 'СНИЛС'
+        self.fields['insurance'].label = 'Страховой полис'
 
     def clean_email(self):
         email = self.cleaned_data['email']
