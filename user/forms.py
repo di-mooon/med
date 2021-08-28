@@ -30,10 +30,10 @@ class ProfilePatientForm(forms.ModelForm):
         'class': 'form-control',
         'placeholder': "СНИЛС"})
     )
-    email = forms.EmailField(widget=forms.EmailInput(attrs={
-        'class': 'form-control',
-        'placeholder': "Email"})
-    )
+    # email = forms.EmailField(widget=forms.EmailInput(attrs={
+    #     'class': 'form-control',
+    #     'placeholder': "Email"})
+    # )
     date = forms.DateField(widget=forms.DateInput(attrs={
         'class': 'form-control',
         'placeholder': "Дата рождения"})
@@ -45,7 +45,7 @@ class ProfilePatientForm(forms.ModelForm):
 
     class Meta:
         model = ProfilePatient
-        fields = ['first_name', 'last_name', 'patronymic', 'phone', 'insurance', 'email', 'date', 'residential_address']
+        fields = ['first_name', 'last_name', 'patronymic', 'phone', 'insurance', 'date', 'residential_address']
 
 
 class RegistrationForm(ProfilePatientForm):
