@@ -147,8 +147,8 @@ DATE_INPUT_FORMATS = ['%d.%m.%Y']
 
 EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465
-EMAIL_HOST_USER = "confirmemaildjangoTEST@yandex.ru"
-EMAIL_HOST_PASSWORD = "confirmemaildjango1234"
+EMAIL_HOST_USER = ""
+EMAIL_HOST_PASSWORD = ""
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
 SERVER_EMAIL = EMAIL_HOST_USER
