@@ -5,7 +5,7 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
-from djangoProject1.settings import EMAIL_HOST_USER
+from django.conf import settings
 from user.models import Mail_Domains
 
 
@@ -30,7 +30,7 @@ def send_mail_activate_account(subject, body, email):
     email_message = EmailMultiAlternatives(
         subject,
         body,
-        EMAIL_HOST_USER,
+        settings.EMAIL_HOST_USER,
         [email]
     )
     email_message.attach_alternative(body, 'text/html')

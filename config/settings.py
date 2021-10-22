@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+from distutils.util import strtobool
 
 load_dotenv('.env.example')
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -8,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS').split(' ')
-DEBUG = os.environ.get('DEBUG', default=True)
+DEBUG = bool(strtobool(os.getenv('DEBUG')))
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -19,13 +20,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'crispy_forms',
-    'debug_toolbar',
 
     'appointment',
     # 'comments',
     'homepage',
     'user',
-
+]
+DEBUG_APPS = [
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
@@ -35,20 +37,26 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+]
+
+DEBUG_MIDDLEWARE = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
+
+if DEBUG:
+    INSTALLED_APPS.extend(DEBUG_APPS)
+    MIDDLEWARE.extend(DEBUG_MIDDLEWARE)
 
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
 
-ROOT_URLCONF = 'djangoProject1.urls'
+ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
-        ,
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -61,10 +69,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'djangoProject1.wsgi.application'
-
-# Database
-# https://docs.djangoproject.com/en/3.1/ref/settings/#databases
+WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
@@ -92,7 +97,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = 'UTC'
@@ -114,7 +118,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
-    'djangoProject1.EmailBackend.CustomBackend',
+    'config.EmailBackend.CustomBackend',
 ]
 
 AUTH_USER_MODEL = 'user.ProfilePatient'
@@ -135,12 +139,8 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 REDIS_HOST = os.environ.get('REDIS_HOST')
 REDIS_PORT = os.environ.get('REDIS_PORT')
 CELERY_BROKER_URL = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
-CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
-CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
-CELERY_ACCEPT_CONTENT = ['application/json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-
+CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 
 SITE_ID = 2
 
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

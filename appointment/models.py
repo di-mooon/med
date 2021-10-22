@@ -1,7 +1,15 @@
 from django.db import models
-from django.contrib.auth.models import User
-from homepage.models import Card
 from user.models import ProfilePatient
+
+
+class Card(models.Model):
+    photo = models.ImageField('Изображение', upload_to='static/')
+    name = models.CharField('Фамилия Имя Отчество', max_length=50)
+    specialty = models.CharField('Специальность', max_length=50)
+    work_experience = models.CharField('Опыт работы', max_length=50)
+
+    def __str__(self):
+        return self.name
 
 
 class DateRecord(models.Model):
@@ -11,13 +19,16 @@ class DateRecord(models.Model):
     def __str__(self):
         return str(self.date)
 
+    class Meta:
+        verbose_name = 'Дата приема'
+        verbose_name_plural = 'Даты приема'
+
 
 class Patient(models.Model):
     name = models.CharField('Ф.И.О', max_length=150, default='')
     email = models.EmailField()
     phone = models.CharField('Телефон', max_length=20)
     insurance = models.CharField('Страховой полис', max_length=20)
-    time_record_create = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(
         ProfilePatient,
         on_delete=models.CASCADE,
@@ -34,9 +45,13 @@ class Patient(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name = 'Пациент'
+        verbose_name_plural = 'Пациенты'
+
 
 class TimeRecord(models.Model):
-    time = models.TimeField('Время приема')
+    time = models.TimeField(verbose_name='Время приема')
     daterecord = models.ForeignKey(
         DateRecord,
         on_delete=models.CASCADE,
@@ -61,17 +76,12 @@ class TimeRecord(models.Model):
         null=True,
         related_name='time_patient'
     )
-    date_now = models.DateTimeField(auto_now_add=True)
+    date_now = models.DateTimeField(verbose_name='Время создания записи', auto_now_add=True)
     recorded = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.time)
 
-
-class Record(models.Model):  # не используется
-    card = models.ForeignKey(Card, on_delete=models.CASCADE, related_name='record')
-    time = models.ForeignKey(TimeRecord, on_delete=models.CASCADE, related_name='record_time', blank=True, null=True)
-    date = models.ForeignKey(DateRecord, on_delete=models.CASCADE, related_name='record_date', blank=True, null=True)
-
-    def get_dt(self):
-        return self.time, self.date
+    class Meta:
+        verbose_name = 'Время записи'
+        verbose_name_plural = 'Время записи'

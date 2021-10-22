@@ -1,4 +1,4 @@
-from djangoProject1.celery import app
+from config.celery import app
 from .service import send_mail_activate_account
 
 
