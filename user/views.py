@@ -9,7 +9,7 @@ from django.views.generic import UpdateView, CreateView
 
 from .forms import ProfilePatientForm, RegistrationForm, LoginForm, PasswordResetUserForm, SetPasswordUserForm, \
     PasswordChangeUserForm
-from .models import ProfilePatient
+from .models import Profile
 from .tasks import send_activate_account
 from .service import create_mail_activate_account
 
@@ -52,7 +52,7 @@ class ProfileActivate(View):
     def get(self, request, *args, **kwargs):
         try:
             uid = force_text(urlsafe_base64_decode(kwargs.get('uidb64')))
-            user = ProfilePatient.objects.get(pk=uid)
+            user = Profile.objects.get(pk=uid)
             if user is not None and default_token_generator.check_token(user, kwargs.get('token')):
                 user.is_active = True
                 user.save()
@@ -64,11 +64,7 @@ class ProfileActivate(View):
 class ProfileDetail(View):
     def get(self, request, *args, **kwargs):
         try:
-            user = ProfilePatient.objects.prefetch_related(
-                'patient_record__time_patient',
-                'patient_record__time_patient__daterecord',
-                'patient_record__time_patient__card',
-            ).get(username=request.user.username, is_active=True)
+            user = Profile.objects.get(username=request.user.username, is_active=True)
         except:
             raise Http404
         context = {
@@ -87,4 +83,4 @@ class ProfileUpdateView(UpdateView):
         return f"/account/{self.request.user.username}/"
 
     def get_queryset(self):
-        return ProfilePatient.objects.filter(username=self.request.user.username, is_active=True)
+        return Profile.objects.filter(username=self.request.user.username, is_active=True)

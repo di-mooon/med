@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 from distutils.util import strtobool
 
-load_dotenv('.env.example')
+load_dotenv('.env')
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
@@ -51,7 +51,7 @@ INTERNAL_IPS = [
     '127.0.0.1',
 ]
 
-ROOT_URLCONF = 'config.urls'
+ROOT_URLCONF = 'med.urls'
 
 TEMPLATES = [
     {
@@ -69,7 +69,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
+WSGI_APPLICATION = 'med.wsgi.application'
 
 DATABASES = {
     'default': {
@@ -118,10 +118,10 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
-    'config.EmailBackend.CustomBackend',
+    'user.EmailBackend.CustomBackend',
 ]
 
-AUTH_USER_MODEL = 'user.ProfilePatient'
+AUTH_USER_MODEL = 'user.Profile'
 # LOGIN_REDIRECT_URL = '/accounts/'
 LOGOUT_REDIRECT_URL = 'card_list'
 

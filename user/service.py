@@ -6,7 +6,7 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
 from django.conf import settings
-from user.models import Mail_Domains
+from user.models import MailDomains
 
 
 def create_mail_activate_account(request, user):

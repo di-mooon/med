@@ -1,11 +1,11 @@
 from django.contrib.auth import password_validation
 from django.core.exceptions import ValidationError
-
-from .models import ProfilePatient, ProfileDoctor
 from django.db.models import Q
 from django import forms
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm, AuthenticationForm, UserCreationForm, \
-    UsernameField, PasswordChangeForm
+    UserChangeForm, UsernameField, PasswordChangeForm
+
+from .models import Profile
 
 
 class ProfilePatientForm(forms.ModelForm):
@@ -44,7 +44,7 @@ class ProfilePatientForm(forms.ModelForm):
     )
 
     class Meta:
-        model = ProfilePatient
+        model = Profile
         fields = ['first_name', 'last_name', 'patronymic', 'phone', 'insurance', 'date', 'residential_address']
 
 
@@ -75,13 +75,13 @@ class RegistrationForm(ProfilePatientForm):
 
     def clean_email(self):
         email = self.cleaned_data['email']
-        if ProfilePatient.objects.filter(email=email).exists():
+        if Profile.objects.filter(email=email).exists():
             raise forms.ValidationError('Данный почтовый ящик уже зарегистрирован')
         return email
 
     def clean_username(self):
         username = self.cleaned_data['username']
-        if ProfilePatient.objects.filter(Q(username=username) | Q(email=username)).exists():
+        if Profile.objects.filter(Q(username=username) | Q(email=username)).exists():
             raise forms.ValidationError('Данный логин уже зарегистрирован')
         return username
 
@@ -102,7 +102,7 @@ class RegistrationForm(ProfilePatientForm):
                 self.add_error('password2', error)
 
     class Meta:
-        model = ProfilePatient
+        model = Profile
         fields = ['username', 'password',
                   'confirm_password', 'first_name',
                   'last_name', 'patronymic', 'date', 'residential_address',
@@ -133,7 +133,7 @@ class LoginForm(AuthenticationForm):
         self.fields['password'].label = 'Пароль'
 
     class Meta:
-        model = ProfilePatient
+        model = Profile
         fields = ['username', 'password']
 
 

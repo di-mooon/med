@@ -1,4 +1,4 @@
-from config.celery import app
+from med.celery import app
 from .service import send_mail_activate_account
 
 
